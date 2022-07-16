@@ -8,7 +8,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-import { router } from './routes';
+import router from './routes';
+import { connectToDB } from './utils/db';
 
 // value(s) from '.env'
 const PORT = process.env.PORT || 3001;
@@ -29,7 +30,10 @@ app.use(cors());
 // TODO: version control - e.g. '/v1' in the first param
 app.use(router);
 
-// 5. start the server
+// 5. connect to MongoDB
+connectToDB();
+
+// 6. start the server
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
