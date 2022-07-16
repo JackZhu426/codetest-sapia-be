@@ -4,4 +4,10 @@
  * @lastModified : 2022/7/16
  */
 import { Router } from 'express';
-import {} from '../controllers/userLogin';
+import { login } from '../controllers/userLogin';
+
+const loginRouter = Router();
+
+loginRouter.post('', login);
+
+export default loginRouter;

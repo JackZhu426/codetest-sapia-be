@@ -15,6 +15,13 @@ const userAccountsSchema = new Schema({
     type: String,
     required: [true, 'password is required'],
   },
+  faildAttempts: {
+    type: Number,
+    default: 0,
+  },
+  lockedTime: {
+    type: Date,
+  },
 });
 
 // 'hash' & 'salt' the password before saving
