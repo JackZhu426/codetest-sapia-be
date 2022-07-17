@@ -1,3 +1,8 @@
+/**
+ * @author: Jack Zhu
+ * @created : 2022/7/16
+ * @lastModified : 2022/7/16
+ */
 import { ResponseType } from 'types';
 
 export const getResponseData = (data: any, errMsg?: string): ResponseType => {
