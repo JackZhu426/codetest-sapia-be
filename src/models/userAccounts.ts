@@ -15,7 +15,7 @@ const userAccountsSchema = new Schema({
     type: String,
     required: [true, 'password is required'],
   },
-  faildAttempts: {
+  failedAttempts: {
     type: Number,
     default: 0,
   },

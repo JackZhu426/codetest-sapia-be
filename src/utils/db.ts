@@ -19,9 +19,10 @@ export const connectToDB = () => {
    * 1 = connected
    * 2 = connecting
    * 3 = disconnecting
+   *
+   * 2nd param: callback fn - listen for connection
    */
-  // 2nd param: listen for connection
-  // 'connected', everything is just fine :)
+  // 'connected': everything is just fine :)
   connection.on('connected', () => {
     console.log('DB connected successfully:', DB_CONNECTION_STRING);
   });

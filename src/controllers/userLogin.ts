@@ -22,30 +22,61 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
   if (!exsitingUser) {
     return res.status(401).json(getResponseData('failed', 'username does not exist!'));
   }
+  // 3. lockedTime exists and > 5min, unlock the user
+
+  console.log('curLockedTime:', exsitingUser.lockedTime?.getTime());
+  console.log('exsitingUser.failedAttempts out of compare:', exsitingUser.failedAttempts);
   if (
     exsitingUser.lockedTime &&
-    new Date().getTime() - exsitingUser.lockedTime.getTime() > 1000 * 60 * 5
+    new Date().getTime() - exsitingUser.lockedTime.getTime() > 1000 * 60
   ) {
-    // TODO: unlock the user
+    // unlock the user
+    console.log('unlock the user');
+    exsitingUser.lockedTime = undefined;
+    exsitingUser.failedAttempts = 0;
+    await exsitingUser.save();
   }
 
   // 3. user exists, but password is wrong, return 'failed'
   // !Attention!: this func returns Promise<boolean>, here must use 'await'
   const isPasswordCorrect = await compare(password, exsitingUser.password);
   if (!isPasswordCorrect) {
-    if (exsitingUser.faildAttempts == 3) {
-      return res.status(401).json(getResponseData('failed', 'account is locked!'));
+    // still has to fetch from db once again, coz it's async
+    const curUser = await UserAccountsModel.findOne({ username }).exec();
+    console.log('curUser.failedAttempts in compare:', curUser?.failedAttempts);
+
+    if (curUser?.failedAttempts === 3) {
+      console.log('lock the user');
+      const curUserLockedTime = curUser.lockedTime?.getTime() || new Date().getTime();
+      return res
+        .status(401)
+        .json(
+          getResponseData(
+            'failed',
+            `account is locked! Please try again after ${Math.ceil(
+              (1000 * 60 - (new Date().getTime() - curUserLockedTime)) / 60000,
+            )} min`,
+          ),
+        );
     }
-    if (exsitingUser.faildAttempts < 3) {
-      if (exsitingUser.faildAttempts == 2) {
-        exsitingUser.lockedTime = new Date();
-      }
-      exsitingUser.faildAttempts += 1;
-      await exsitingUser.save();
-      return res.status(401).json(getResponseData('failed', 'password is wrong!'));
+
+    if (curUser?.failedAttempts == 2) {
+      console.log('add the lockedTime');
+      const lockedTimeUser = await UserAccountsModel.findOneAndUpdate(
+        { username },
+        { lockedTime: new Date() },
+        { new: true },
+      ).exec();
+      console.log('lockedTimeUser:', lockedTimeUser?.lockedTime);
     }
-    // TODO: db: field 'failedAttempts' should be incremented
-    UserAccountsModel.updateOne({ username }, { $inc: { faildAttempts: 1 } }).exec();
+    // db: field 'failedAttempts' should be incremented
+    const incAttemptUser = await UserAccountsModel.findOneAndUpdate(
+      { username },
+      { $inc: { failedAttempts: 1 } },
+      { new: true },
+    ).exec();
+    console.log('IncAttemptUser:', incAttemptUser?.failedAttempts);
+
     return res.status(401).json(getResponseData('failed', 'password is wrong!'));
   }
   // 4. user exists & password is correct,

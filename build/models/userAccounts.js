@@ -26,6 +26,13 @@ const userAccountsSchema = new mongoose_1.Schema({
         type: String,
         required: [true, 'password is required'],
     },
+    failedAttempts: {
+        type: Number,
+        default: 0,
+    },
+    lockedTime: {
+        type: Date,
+    },
 });
 // 'hash' & 'salt' the password before saving
 userAccountsSchema.method('hashPassword', function () {
