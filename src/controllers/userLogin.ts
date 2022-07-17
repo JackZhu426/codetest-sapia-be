@@ -57,6 +57,8 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
     console.log('exsitingUser.failedAttempts IN compare:', exsitingUser.failedAttempts);
     // console.log('curUser.failedAttempts in compare:', curUser.failedAttempts);
 
+    // tried 2 time, but still wrong password, lock the user
+    // 1) add the lockedTime  2) add the failedAttempts
     if (exsitingUser.failedAttempts === 2) {
       console.log('add the lockedTime');
       // const lockedTimeUser = await UserAccountsModel.findOneAndUpdate(
