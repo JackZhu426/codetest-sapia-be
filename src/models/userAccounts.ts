@@ -24,14 +24,5 @@ const userAccountsSchema = new Schema({
   },
 });
 
-// 'hash' & 'salt' the password before saving
-userAccountsSchema.method('hashPassword', async function () {
-  this.password = await hash(this.password, 10);
-});
-
-userAccountsSchema.methods.comparePassword = async function (pwdByUser: string) {
-  return await compare(pwdByUser, this.password);
-};
-
 // export the model for controller (i.e. controllers/userLogin.ts and controllers/userRegister.ts) to use
 export const UserAccountsModel = model('UserAccounts', userAccountsSchema);
