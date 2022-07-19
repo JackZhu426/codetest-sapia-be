@@ -17,7 +17,6 @@ const responseData_1 = require("../utils/responseData");
 const getTimeLapse_1 = require("../utils/getTimeLapse");
 // export this controller function for routes (i.e. routes/userLogin.ts) to use
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const { username, password } = req.body;
     // 1. find the user by 'username'
     const exsitingUser = yield userAccounts_1.UserAccountsModel.findOne({ username }).exec();
@@ -25,25 +24,28 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!exsitingUser) {
         return res.status(401).json((0, responseData_1.getResponseData)('failed', 'username does not exist!'));
     }
-    // 3. lockedTime exists and > 5min, unlock the user
-    console.log('curLockedTime:', (_a = exsitingUser.lockedTime) === null || _a === void 0 ? void 0 : _a.getTime());
-    console.log('exsitingUser.failedAttempts out of compare:', exsitingUser.failedAttempts);
-    // still locked (i.e. failedAttempts 3 times in 5 minutes) - return 'failed',
-    // even if you enter the right username & password
-    if (exsitingUser.lockedTime && (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime) <= 1000 * 60 * 3) {
+    // 3. lockedTime exists and <= 5min, still locked - return 'failed'
+    // even if the user enters the right username & password
+    // Note: used to put the logic 5. (some logic, diff code) before it to save some chunks of the code, but here follow the 'fail fast' rule
+    if (exsitingUser.lockedTime && (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime) <= 1000 * 60 * 5) {
         return res
             .status(401)
-            .json((0, responseData_1.getResponseData)('failed', `account is locked! Please try again after ${Math.ceil((1000 * 60 * 3 - (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime)) / 60000)} min`));
+            .json((0, responseData_1.getResponseData)('failed', `account is locked! Please try again after ${Math.ceil((1000 * 60 * 5 - (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime)) / 60000)} min`));
     }
-    // 3. user exists, but password is wrong, return 'failed'
-    // !Attention!: this func returns Promise<boolean>, here must use 'await'
+    // 4. user exists, check the password
     const isPasswordCorrect = yield (0, bcrypt_1.compare)(password, exsitingUser.password);
+    // 5. conditions: more than 5 min (unlock the user) || (if not locked) username & password are right , reset db fields
+    if ((exsitingUser.lockedTime && (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime) > 1000 * 60 * 5) ||
+        isPasswordCorrect) {
+        exsitingUser.lockedTime = undefined;
+        exsitingUser.failedAttempts = 0;
+    }
+    // 6. if the password is wrong
     if (!isPasswordCorrect) {
         exsitingUser.failedAttempts += 1;
         // tried 2 time, but still wrong password, lock the user
         // 1) add the lockedTime  2) add the failedAttempts
-        if (exsitingUser.failedAttempts >= 3) {
-            console.log('add the lockedTime');
+        if (exsitingUser.failedAttempts === 3) {
             exsitingUser.lockedTime = new Date();
         }
         // db: field 'failedAttempts' is incremented by 1
@@ -51,8 +53,6 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         yield exsitingUser.save();
         return res.status(401).json((0, responseData_1.getResponseData)('failed', 'password is wrong!'));
     }
-    exsitingUser.lockedTime = undefined;
-    exsitingUser.failedAttempts = 0;
     yield exsitingUser.save();
     // 4. user exists & password is correct
     const token = (0, jwt_1.generateToken)({ username });
