@@ -17,6 +17,7 @@ const responseData_1 = require("../utils/responseData");
 const getTimeLapse_1 = require("../utils/getTimeLapse");
 // export this controller function for routes (i.e. routes/userLogin.ts) to use
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('goes into login');
     const { username, password } = req.body;
     // 1. find the user by 'username'
     const exsitingUser = yield userAccounts_1.UserAccountsModel.findOne({ username }).exec();
@@ -26,7 +27,6 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // 3. lockedTime exists and <= 5min, still locked - return 'failed'
     // even if the user enters the right username & password
-    // Note: used to put the logic 5. (some logic, diff code) before it to save some chunks of the code, but here follow the 'fail fast' rule
     if (exsitingUser.lockedTime && (0, getTimeLapse_1.getTimeLapse)(exsitingUser.lockedTime) <= 1000 * 60 * 5) {
         return res
             .status(401)
@@ -38,15 +38,16 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     exsitingUser.lockedTime = undefined;
     // 6. if the password is wrong
     if (!isPasswordCorrect) {
+        console.log('goes into wrong password');
+        // field 'failedAttempts' is incremented by 1
         exsitingUser.failedAttempts += 1;
-        // tried 2 time, but still wrong password, lock the user
+        // tried 2 times, but still wrong password, lock the user
         // 1) add the lockedTime  2) reset the failedAttempts (tweaked the logic)
         if (exsitingUser.failedAttempts === 3) {
+            console.log('goes into failedAttempts === 3');
             exsitingUser.lockedTime = new Date();
             exsitingUser.failedAttempts = 0;
         }
-        // db: field 'failedAttempts' is incremented by 1
-        console.log('exsisting user failed attempts:', exsitingUser.failedAttempts);
         yield exsitingUser.save();
         return res.status(401).json((0, responseData_1.getResponseData)('failed', 'password is wrong!'));
     }

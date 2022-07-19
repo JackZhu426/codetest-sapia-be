@@ -1,9 +1,9 @@
 /**
  * @author: Jack Zhu
  * @created : 2022/7/16
- * @lastModified : 2022/7/19
+ * @lastModified : 2022/7/20
  */
-// Request is replaced by interface: RequestWithBodyType
+// down below {Request} is replaced by custom interface: RequestWithBodyType
 import { Response } from 'express';
 import { compare } from 'bcrypt';
 
@@ -15,6 +15,7 @@ import { RequestWithBodyType } from '../types';
 
 // export this controller function for routes (i.e. routes/userLogin.ts) to use
 export const login = async (req: RequestWithBodyType, res: Response) => {
+  console.log('goes into login');
   const { username, password } = req.body;
   // 1. find the user by 'username'
   const exsitingUser = await UserAccountsModel.findOne({ username }).exec();
@@ -27,6 +28,7 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
   // 3. lockedTime exists and <= 5min, still locked - return 'failed'
   // even if the user enters the right username & password
   if (exsitingUser.lockedTime && getTimeLapse(exsitingUser.lockedTime) <= 1000 * 60 * 5) {
+    console.log('goes into user locked!!');
     return res
       .status(401)
       .json(
@@ -47,12 +49,14 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
 
   // 6. if the password is wrong
   if (!isPasswordCorrect) {
+    console.log('goes into wrong password');
     // field 'failedAttempts' is incremented by 1
     exsitingUser.failedAttempts += 1;
 
-    // tried 2 time, but still wrong password, lock the user
+    // tried 2 times, but still wrong password, lock the user
     // 1) add the lockedTime  2) reset the failedAttempts (tweaked the logic)
     if (exsitingUser.failedAttempts === 3) {
+      console.log('goes into failedAttempts === 3');
       exsitingUser.lockedTime = new Date();
       exsitingUser.failedAttempts = 0;
     }
