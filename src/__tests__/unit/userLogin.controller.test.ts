@@ -43,18 +43,25 @@ describe('test user login logic', () => {
   });
 
   test('if the password is wrong, but less than 3 times in 5 min', async () => {
-    const req = getMockReq({ body: { username: 'jack', password: '123' } });
+    const req = getMockReq({ body: { username: 'jack', password: '1234' } });
     const { res } = getMockRes();
-    mockingoose(UserAccountsModel).toReturn(
-      { username: 'jack', password: '1234', lockedTime: new Date(2000, 1, 1) },
-      'findOne',
-    );
-    const user = await UserAccountsModel.findOne();
+    const returnUserMock = jest.fn().mockReturnValue({ username: 'jack', password: '1234' });
+    mockingoose(UserAccountsModel).toReturn(returnUserMock, 'findOne');
+    const user = await UserAccountsModel.findOne({ username: 'jack' });
     console.log('user is:', user);
-    compare.mockReturnValue(true);
+    compare.mockReturnValue(false);
     // 1. more than 5 min
     await login(req, res);
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({});
+    expect(user).toBeDefined();
+    expect(user?.failedAttempts).toBe(user?.failedAttempts ? user?.failedAttempts : 0);
+    expect(user?.save).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: 'failed',
+        errMsg: 'password is wrong!',
+        success: false,
+      }),
+    );
   });
 });

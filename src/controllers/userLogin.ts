@@ -26,7 +26,6 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
 
   // 3. lockedTime exists and <= 5min, still locked - return 'failed'
   // even if the user enters the right username & password
-  // Note: used to put the logic 5. (some logic, diff code) before it to save some chunks of the code, but here follow the 'fail fast' rule
   if (exsitingUser.lockedTime && getTimeLapse(exsitingUser.lockedTime) <= 1000 * 60 * 5) {
     return res
       .status(401)
@@ -48,6 +47,7 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
 
   // 6. if the password is wrong
   if (!isPasswordCorrect) {
+    // field 'failedAttempts' is incremented by 1
     exsitingUser.failedAttempts += 1;
 
     // tried 2 time, but still wrong password, lock the user
@@ -56,8 +56,6 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
       exsitingUser.lockedTime = new Date();
       exsitingUser.failedAttempts = 0;
     }
-    // db: field 'failedAttempts' is incremented by 1
-    console.log('exsisting user failed attempts:', exsitingUser.failedAttempts);
     await exsitingUser.save();
 
     return res.status(401).json(getResponseData('failed', 'password is wrong!'));
