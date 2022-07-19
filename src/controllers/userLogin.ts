@@ -1,7 +1,7 @@
 /**
  * @author: Jack Zhu
  * @created : 2022/7/16
- * @lastModified : 2022/7/17
+ * @lastModified : 2022/7/19
  */
 // Request is replaced by interface: RequestWithBodyType
 import { Response } from 'express';
@@ -43,23 +43,18 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
   // 4. user exists, check the password
   const isPasswordCorrect = await compare(password, exsitingUser.password);
 
-  // 5. conditions: more than 5 min (unlock the user) || (if not locked) username & password are right , reset db fields
-  if (
-    (exsitingUser.lockedTime && getTimeLapse(exsitingUser.lockedTime) > 1000 * 60 * 5) ||
-    isPasswordCorrect
-  ) {
-    exsitingUser.lockedTime = undefined;
-    exsitingUser.failedAttempts = 0;
-  }
+  // 5. more than 5 min (unlock the user)
+  exsitingUser.lockedTime = undefined;
 
   // 6. if the password is wrong
   if (!isPasswordCorrect) {
     exsitingUser.failedAttempts += 1;
 
     // tried 2 time, but still wrong password, lock the user
-    // 1) add the lockedTime  2) add the failedAttempts
+    // 1) add the lockedTime  2) reset the failedAttempts (tweaked the logic)
     if (exsitingUser.failedAttempts === 3) {
       exsitingUser.lockedTime = new Date();
+      exsitingUser.failedAttempts = 0;
     }
     // db: field 'failedAttempts' is incremented by 1
     console.log('exsisting user failed attempts:', exsitingUser.failedAttempts);
