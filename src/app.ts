@@ -3,14 +3,14 @@
  * @created : 2022/7/20
  * @lastModified : 2022/7/20
  */
-import express from 'express';
+import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import router from './routes';
 
 // 1. Create an express application
-const app = express();
+const app: Application = express();
 
 // 2. Add middleware to parse incoming requests
 // 2.1 parse application/json

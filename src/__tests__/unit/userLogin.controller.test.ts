@@ -100,7 +100,6 @@ describe('test user login logic', () => {
 
   test('if the password is right', async () => {
     const req = getMockReq({ body: { username: 'jack', password: '123' } });
-    console.log('req body:', req.body.username);
     const { res } = getMockRes();
     const _doc = { username: 'jack', password: '123' };
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
