@@ -59,14 +59,19 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
       console.log('goes into failedAttempts === 3');
       exsitingUser.lockedTime = new Date();
       exsitingUser.failedAttempts = 0;
+      await exsitingUser.save();
+      return res
+        .status(401)
+        .json(getResponseData('failed', 'You have failed to try 3 times! Account is locked!'));
     }
     await exsitingUser.save();
-
-    return res.status(401).json(getResponseData('failed', 'password is wrong!'));
+    return res.status(401).json(getResponseData('failed', 'Password is wrong! Please try again!'));
   }
-
+  // 7. if the password is correct, reset 'failedAttempts'
+  console.log('goes into right password');
+  exsitingUser.failedAttempts = 0;
   await exsitingUser.save();
-  // 4. user exists & password is correct
+  // 8. user exists & password is correct
   const token = generateToken({ username });
   return res.status(201).json(getResponseData({ token, username }));
 };

@@ -17,7 +17,8 @@ export const register = async (req: RequestWithBodyType, res: Response) => {
   const { username, password } = req.body;
   // 1. check if the username already exists
   const userAccounts = await UserAccountsModel.findOne({ username });
-  if (userAccounts) return res.status(409).json(getResponseData(false, 'username already exists!'));
+  if (userAccounts)
+    return res.status(409).json(getResponseData('failed', 'username already exists!'));
 
   // 2. if not, register
   // 2.1 'hash' & 'salt' the password before saving

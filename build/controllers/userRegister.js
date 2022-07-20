@@ -20,7 +20,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // 1. check if the username already exists
     const userAccounts = yield userAccounts_1.UserAccountsModel.findOne({ username });
     if (userAccounts)
-        return res.status(409).json((0, responseData_1.getResponseData)(false, 'username already exists!'));
+        return res.status(409).json((0, responseData_1.getResponseData)('failed', 'username already exists!'));
     // 2. if not, register
     // 2.1 'hash' & 'salt' the password before saving
     const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
