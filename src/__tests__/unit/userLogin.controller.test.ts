@@ -1,3 +1,8 @@
+/**
+ * @author: Jack Zhu
+ * @created : 2022/7/18
+ * @lastModified : 2022/7/20
+ */
 import { jest } from '@jest/globals';
 import { login } from '../../controllers/userLogin';
 import { getMockReq, getMockRes } from '@jest-mock/express';
@@ -101,7 +106,7 @@ describe('test user login logic', () => {
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
     const user = await UserAccountsModel.findOne({ username: 'jack' });
     compare.mockReturnValue(true);
-    // 1. more than 5 min
+    // more than 5 min
     await login(req, res);
     expect(user).toBeDefined();
     expect(user?.save).toHaveBeenCalled();
