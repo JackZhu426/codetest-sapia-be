@@ -60,8 +60,8 @@ describe('test user login logic', () => {
     const { res } = getMockRes();
     const returnUserMock = jest.fn().mockReturnValue({ username: 'jack', password: '1234' });
     mockingoose(UserAccountsModel).toReturn(returnUserMock, 'findOne');
-    const user = await UserAccountsModel.findOne({ username: 'jack' });
     compare.mockReturnValue(false);
+    const user = await UserAccountsModel.findOne({ username: 'jack' });
     // 1. more than 5 min
     await login(req, res);
     expect(user).toBeDefined();
@@ -83,7 +83,7 @@ describe('test user login logic', () => {
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
     const user = await UserAccountsModel.findOne({ username: 'jack' });
     compare.mockReturnValue(false);
-    // 1. more than 5 min
+    // more than 5 min
     await login(req, res);
     expect(user).toBeDefined();
     expect(user?.save).toHaveBeenCalled();
@@ -105,7 +105,6 @@ describe('test user login logic', () => {
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
     const user = await UserAccountsModel.findOne({ username: 'jack' });
     compare.mockReturnValue(true);
-    // more than 5 min
     await login(req, res);
     expect(user).toBeDefined();
     expect(user?.save).toHaveBeenCalled();

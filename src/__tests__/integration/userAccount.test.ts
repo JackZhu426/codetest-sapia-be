@@ -39,16 +39,81 @@ describe('/login', () => {
       password: '123',
     };
     const res = await request(app).post('/login').send(body);
-    console.log('find one:', await UserAccountsModel.findOne({ username: 'jack' }));
-    console.log('res:', res.body.data.token);
+    // console.log('find one:', await UserAccountsModel.findOne({ username: 'jack' }));
+    // console.log('res:', res.body.data.token);
     expect(res.statusCode).toBe(201);
     expect(res.body).toEqual(
       expect.objectContaining({
         data: {
           token: res.body.data.token,
-          username: 'jack',
+          username: res.body.data.username,
         },
         success: true,
+      }),
+    );
+  });
+
+  it('should return fail if username and password are not matched', async () => {
+    const body = {
+      username: 'jack',
+      password: '1234',
+    };
+    const res = await request(app).post('/login').send(body);
+    const user = await UserAccountsModel.findOne({ username: body.username });
+    expect(user).toBeDefined();
+    // expect(user?.save).toHaveBeenCalled();
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        data: 'failed',
+        errMsg: 'Password is wrong! Please try again!',
+        success: false,
+      }),
+    );
+  });
+
+  it('should return fail and lock the account if user has failed to try 3 times in 5 min', async () => {
+    const body = {
+      username: 'jack',
+      password: '1234',
+    };
+    // mock a user who has failed to try 2 times already
+    const user = await UserAccountsModel.findOneAndUpdate(
+      { username: body.username },
+      { failedAttempts: 2 },
+      { new: true },
+    ).exec();
+    // console.log('new user:', user);
+    const res = await request(app).post('/login').send(body);
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        data: 'failed',
+        errMsg: 'You have failed to try 3 times! Account is locked!',
+        success: false,
+      }),
+    );
+  });
+
+  it('should return fail if the user account has been locked', async () => {
+    const body = {
+      username: 'jack',
+      password: '123',
+    };
+    // mock a user who has failed to try 3 times in 5 min and has been locked
+    const user = await UserAccountsModel.findOneAndUpdate(
+      { username: body.username },
+      { lockedTime: new Date() },
+      { new: true },
+    ).exec();
+    // console.log('new user:', user);
+    const res = await request(app).post('/login').send(body);
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        data: 'failed',
+        errMsg: 'account is locked! Please try again after 5 min',
+        success: false,
       }),
     );
   });
