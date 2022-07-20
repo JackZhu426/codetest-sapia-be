@@ -22,7 +22,7 @@ describe('/login', () => {
     await mongoose.connection.close();
   });
 
-  // clear the db before each test
+  // 1) clear the db before each test  2) insert a new user account
   beforeEach(async () => {
     await UserAccountsModel.deleteMany({}).exec();
     const hashedPassword = await hash('123', 10);
