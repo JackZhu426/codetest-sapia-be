@@ -12,7 +12,6 @@ const getResponseData = (data, errMsg) => {
     }
     return {
         success: true,
-        errMsg: errMsg,
         data: data,
     };
 };

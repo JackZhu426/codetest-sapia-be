@@ -1,7 +1,7 @@
 /**
  * @author: Jack Zhu
  * @created : 2022/7/20
- * @lastModified : 2022/7/20
+ * @lastModified : 2022/7/21
  */
 // const mongoose = require('mongoose');
 import mongoose from 'mongoose';
@@ -37,8 +37,6 @@ describe('/login', () => {
       password: '123',
     };
     const res = await request(app).post('/login').send(body);
-    console.log('find one:', await UserAccountsModel.findOne({ username: 'jack' }));
-    // console.log('res:', res.body.data.token);
     expect(res.statusCode).toBe(201);
     expect(res.body.data.token).toBeDefined();
     expect(res.body.data.username).toBe(body.username);

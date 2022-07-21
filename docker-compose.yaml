@@ -1,0 +1,18 @@
+version: '3'
+services:
+  server:
+    build: .
+    ports:
+      - 3001:3001
+    container_name: jack-codetest-server
+    depends_on:
+      - mongo
+    environment:
+      DB_CONNECTION_STRING: mongodb://mongo/codetest
+      JWT_KEY: secretjackzhu
+      
+  mongo:
+    image: mongo
+    ports: 
+      - 27017:27017
+    container_name: jack-codetest-mongo

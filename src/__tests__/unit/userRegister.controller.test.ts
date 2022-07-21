@@ -49,7 +49,6 @@ describe('test user register logic', () => {
       username: req.body.username,
       password: 'hashedPassword',
     });
-    console.log('register user:', user);
     expect(user).toBeDefined();
     expect(user?.save).toHaveBeenCalled();
     expect(generateToken).toHaveBeenCalledWith({ username: req.body.username });
