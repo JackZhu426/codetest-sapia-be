@@ -24,7 +24,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // 2. if not, register
     // 2.1 'hash' & 'salt' the password before saving
     const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
-    // !Attention!: password is hashed, need to write the key instead of 'Object Literal Property Value Shorthand'
     const newUserAccounts = new userAccounts_1.UserAccountsModel({ username: username, password: hashedPassword });
     yield newUserAccounts.save();
     // 3. jwt, generate token (payload: object)

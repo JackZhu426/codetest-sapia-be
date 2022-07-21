@@ -1,7 +1,7 @@
 /**
  * @author: Jack Zhu
  * @created : 2022/7/18
- * @lastModified : 2022/7/21
+ * @lastModified : 2022/7/22
  */
 import { jest } from '@jest/globals';
 import { login } from '../../controllers/userLogin';
@@ -24,7 +24,9 @@ describe('test user login logic', () => {
     const req = getMockReq({ body: { username: 'jack', password: '1234' } });
     const { res } = getMockRes();
     mockingoose(UserAccountsModel).toReturn(undefined, 'findOne');
+
     await login(req, res);
+
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -38,9 +40,11 @@ describe('test user login logic', () => {
   test('if the account is locked', async () => {
     const req = getMockReq({ body: { username: 'jack', password: '1234' } });
     const { res } = getMockRes();
-    const _doc = { lockedTime: new Date() };
+    const _doc = { failedTime: new Date(), failedAttempts: 3 };
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
+
     await login(req, res);
+
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -58,8 +62,27 @@ describe('test user login logic', () => {
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
     jest.spyOn(brcypt, 'compare').mockImplementation(() => false);
 
-    // more than 5 min
     await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: 'failed',
+        errMsg: 'Password is wrong! Please try again!',
+        success: false,
+      }),
+    );
+  });
+
+  test('if it is over 5 min after user entered the wrong password, but user still enters the wrong password', async () => {
+    const req = getMockReq({ body: { username: 'jack', password: '1234' } });
+    const { res } = getMockRes();
+    const _doc = { username: 'jack', password: '1234', failedTime: new Date(2000, 1, 1) };
+    mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
+    jest.spyOn(brcypt, 'compare').mockImplementation(() => false);
+
+    await login(req, res);
+
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -77,8 +100,9 @@ describe('test user login logic', () => {
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
 
     jest.spyOn(brcypt, 'compare').mockImplementation(() => false);
-    // more than 5 min
+
     await login(req, res);
+
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -94,10 +118,11 @@ describe('test user login logic', () => {
     const { res } = getMockRes();
     const _doc = { username: 'jack', password: '123' };
     mockingoose(UserAccountsModel).toReturn(_doc, 'findOne');
-
     jest.spyOn(brcypt, 'compare').mockImplementation(() => true);
     generateToken.mockImplementation(() => 'token');
+
     await login(req, res);
+
     expect(generateToken).toHaveBeenCalledWith({ username: req.body.username });
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(

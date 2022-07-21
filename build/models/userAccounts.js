@@ -20,7 +20,7 @@ const userAccountsSchema = new mongoose_1.Schema({
         type: Number,
         default: 0,
     },
-    lockedTime: {
+    failedTime: {
         type: Date,
     },
 });

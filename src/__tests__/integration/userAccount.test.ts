@@ -89,7 +89,7 @@ describe('/login', () => {
     // create a user who has failed to try 3 times in 5 min and has been locked
     await UserAccountsModel.findOneAndUpdate(
       { username: body.username },
-      { lockedTime: new Date() },
+      { failedTime: new Date(), failedAttempts: 3 },
     ).exec();
 
     const res = await request(app).post('/login').send(body);

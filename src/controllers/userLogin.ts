@@ -1,7 +1,7 @@
 /**
  * @author: Jack Zhu
  * @created : 2022/7/16
- * @lastModified : 2022/7/20
+ * @lastModified : 2022/7/22
  */
 // down below {Request} is replaced by custom interface: RequestWithBodyType
 import { Response } from 'express';
@@ -26,14 +26,18 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
 
   // 3. lockedTime exists and <= 5min, still locked - return 'failed'
   // even if the user enters the right username & password
-  if (exsitingUser.lockedTime && getTimeLapse(exsitingUser.lockedTime) <= 1000 * 60 * 5) {
+  if (
+    exsitingUser.failedTime &&
+    getTimeLapse(exsitingUser.failedTime) <= 1000 * 60 * 5 &&
+    exsitingUser.failedAttempts === 3
+  ) {
     return res
       .status(401)
       .json(
         getResponseData(
           'failed',
           `account is locked! Please try again after ${Math.ceil(
-            (1000 * 60 * 5 - getTimeLapse(exsitingUser.lockedTime)) / 60000,
+            (1000 * 60 * 5 - getTimeLapse(exsitingUser.failedTime)) / 60000,
           )} min`,
         ),
       );
@@ -42,32 +46,36 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
   // 4. user exists, check the password
   const isPasswordCorrect = await compare(password, exsitingUser.password);
 
-  // 5. more than 5 min (unlock the user)
-  exsitingUser.lockedTime = undefined;
+  // 5. reset 'failedAttempts' and 'failedTime' under 2 circumstances:
+  // a. user enters the right username & password
+  // b. 5 min after last wrong password entered
+  if (
+    isPasswordCorrect ||
+    (exsitingUser.failedTime && getTimeLapse(exsitingUser.failedTime) > 1000 * 60 * 5)
+  ) {
+    exsitingUser.failedAttempts = 0;
+    exsitingUser.failedTime = undefined;
+  }
 
-  // 6. if the password is wrong
+  // 6. if the password is wrong, return 'failed' (fail fast)
   if (!isPasswordCorrect) {
     // field 'failedAttempts' is incremented by 1
     exsitingUser.failedAttempts += 1;
+    // field 'failedTime' is updated
+    exsitingUser.failedTime = new Date();
+    await exsitingUser.save();
 
-    // tried 2 times, but still wrong password, lock the user
-    // 1) add the lockedTime  2) reset the failedAttempts (tweaked the logic)
+    // 3rd time try, but still wrong password, lock the user
     if (exsitingUser.failedAttempts === 3) {
-      exsitingUser.lockedTime = new Date();
-      exsitingUser.failedAttempts = 0;
-      await exsitingUser.save();
       return res
         .status(401)
         .json(getResponseData('failed', 'You have failed to try 3 times! Account is locked!'));
     }
-    await exsitingUser.save();
     return res.status(401).json(getResponseData('failed', 'Password is wrong! Please try again!'));
   }
 
-  // 7. if the password is correct, reset 'failedAttempts'
-  exsitingUser.failedAttempts = 0;
+  // 7. user exists & password is correct (reset logic is hoisted above)
   await exsitingUser.save();
-  // 8. user exists & password is correct
   const token = generateToken({ username });
   return res.status(201).json(getResponseData({ token, username }));
 };

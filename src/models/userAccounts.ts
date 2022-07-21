@@ -4,7 +4,6 @@
  * @lastModified : 2022/7/15
  */
 import { Schema, model } from 'mongoose';
-import { hash, compare } from 'bcrypt';
 
 const userAccountsSchema = new Schema({
   username: {
@@ -19,7 +18,7 @@ const userAccountsSchema = new Schema({
     type: Number,
     default: 0,
   },
-  lockedTime: {
+  failedTime: {
     type: Date,
   },
 });
