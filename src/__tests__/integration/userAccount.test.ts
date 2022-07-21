@@ -83,7 +83,7 @@ describe('/login', () => {
       { failedAttempts: 2 },
       { new: true },
     ).exec();
-    // console.log('new user:', user);
+
     const res = await request(app).post('/login').send(body);
     expect(res.statusCode).toBe(401);
     expect(res.body).toEqual(
