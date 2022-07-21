@@ -16,7 +16,6 @@ export const getResponseData = (data: any, errMsg?: string): ResponseType => {
   }
   return {
     success: true,
-    errMsg: errMsg,
     data: data,
   };
 };

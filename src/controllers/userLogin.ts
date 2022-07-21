@@ -63,8 +63,8 @@ export const login = async (req: RequestWithBodyType, res: Response) => {
     await exsitingUser.save();
     return res.status(401).json(getResponseData('failed', 'Password is wrong! Please try again!'));
   }
-  // 7. if the password is correct, reset 'failedAttempts'
 
+  // 7. if the password is correct, reset 'failedAttempts'
   exsitingUser.failedAttempts = 0;
   await exsitingUser.save();
   // 8. user exists & password is correct

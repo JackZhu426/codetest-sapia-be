@@ -60,7 +60,6 @@ describe('test user register logic', () => {
           token: 'token',
           username: 'jack',
         },
-        errMsg: undefined,
         success: true,
       }),
     );
