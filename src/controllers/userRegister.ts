@@ -23,7 +23,6 @@ export const register = async (req: RequestWithBodyType, res: Response) => {
   // 2. if not, register
   // 2.1 'hash' & 'salt' the password before saving
   const hashedPassword = await hash(password, 10);
-  // !Attention!: password is hashed, need to write the key instead of 'Object Literal Property Value Shorthand'
   const newUserAccounts = new UserAccountsModel({ username: username, password: hashedPassword });
 
   await newUserAccounts.save();
