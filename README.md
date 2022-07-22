@@ -62,14 +62,14 @@ npm start
 
 #### Test on Postman
 
-The server is running on your localhost which is `http://localhost`, and the Port I put in `.env` (I kept it for convenience) is `3001`, so the base url is `http://localhost:3001/`
+The Port I put in `.env` (I kept it for convenience) is `3001`, so the base url is `http://localhost:3001`
 
 There are 2 APIs `register` and `login`, both take JSON body and required keys are `username` (String) and `password` (String), example is shown below:
 
-| HTTP Request |   API    |                   Body                   |
-| :----------: | :------: | :--------------------------------------: |
-|     POST     | register | { "username": "jack", "password": "123"} |
-|     POST     |  login   | { "username": "jack", "password": "123"} |
+| HTTP Request |    API    |                   Body                   |
+| :----------: | :-------: | :--------------------------------------: |
+|     POST     | /register | { "username": "jack", "password": "123"} |
+|     POST     |  /login   | { "username": "jack", "password": "123"} |
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
