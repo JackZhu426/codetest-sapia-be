@@ -26,15 +26,15 @@ After downloading this project, you can run this app by following simple steps
 
 1. Docker Compose (If use Docker to run this project)
 
-2. NPM (if use JavaScript packages manager)
+2. NPM (if run locally)
 
 3. Node version: v16.14.0
 
-4. MongoDB
+4. MongoDB (if run locally)
 
 ### Usage
 
-#### Run the project on Docker
+#### Option1: Run the project on Docker
 
 Once launch the Docker, run the following command on your CLI at the dir of your project:
 
@@ -44,7 +44,7 @@ docker compose up
 
 You will see there are two **_Containers_** created and running, which are `jack-codetest-mongo` and `jack-codetest-server`, then you can test APIs it on **Postman** (or any other API testing tool you like 😉)
 
-#### Run the project locally
+#### Option2: Run the project locally
 
 1. Install `node_modules` dependencies via command:
 
