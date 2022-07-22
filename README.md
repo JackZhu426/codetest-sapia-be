@@ -36,9 +36,9 @@ npm install npm@latest -g
 npm i
 ```
 
-### Usage
+## Usage
 
-#### Run on Docker
+### Run on Docker
 
 After your Docker launch, run the following command:
 
@@ -46,15 +46,35 @@ After your Docker launch, run the following command:
 docker compose up
 ```
 
-You will see there are two **_Containers_** created and running, which are `jack-codetest-mongo` and `jack-codetest-server`, then you can test APIs it on **Postman** (or any other API testing tool you like)
+You will see there are two **_Containers_** created and running, which are `jack-codetest-mongo` and `jack-codetest-server`, then you can test APIs it on **Postman** (or any other API testing tool you like 😉)
 
-#### Test on Postman
+### Test on Postman
 
 The server is running on your localhost which is `http://localhost`, and the Port I put is `3001`, so the base url is `http://localhost:3001/`
 
 There are 2 APIs `register` and `login`, both take JSON body and required keys are `username` (String) and `password` (String), example is shown below:
 
-| Request |   API    |                                     Body |
-| ------- | :------: | ---------------------------------------: |
-| POST    | register | { "username": "jack", "password": "123"} |
-| POST    |  login   | { "username": "jack", "password": "123"} |
+| HTTP Request |   API    |                   Body                   |
+| :----------: | :------: | :--------------------------------------: |
+|     POST     | register | { "username": "jack", "password": "123"} |
+|     POST     |  login   | { "username": "jack", "password": "123"} |
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+### Tests coverage check or run locally
+
+In case you want to check the unit/integration testing, you can run this code locally simply by running the commands on the CLI under your project path:
+
+1. Run unit and integration testing:
+
+```sh
+npm run test
+```
+
+2. Run the project locally
+
+```sh
+npm start
+```
+
+## What I've tested
