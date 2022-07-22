@@ -81,4 +81,10 @@ npm start
 
 ## What I've tested
 
+### Test Coverage
+
+![test-coverge](img_own_test/test.jpg)
+
+###
+
 <p align="right">(<a href="#top">back to top</a>)</p>
