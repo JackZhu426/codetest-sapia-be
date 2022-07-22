@@ -36,9 +36,9 @@ npm install npm@latest -g
 npm i
 ```
 
-## Usage
+### Usage
 
-### Run on Docker
+#### Run on Docker
 
 After your Docker launch, run the following command:
 
@@ -48,7 +48,7 @@ docker compose up
 
 You will see there are two **_Containers_** created and running, which are `jack-codetest-mongo` and `jack-codetest-server`, then you can test APIs it on **Postman** (or any other API testing tool you like 😉)
 
-### Test on Postman
+#### Test on Postman
 
 The server is running on your localhost which is `http://localhost`, and the Port I put is `3001`, so the base url is `http://localhost:3001/`
 
@@ -77,4 +77,8 @@ npm run test
 npm start
 ```
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## What I've tested
+
+<p align="right">(<a href="#top">back to top</a>)</p>
