@@ -13,7 +13,7 @@ It connects to the MongoDB and provides **User Login** and **User Register** (ju
   - User puts the wrong password less than 3 times under 5 min, return 'failed', alongside the error message: Password is wrong! Please try again!
   - User puts the wrong password which hits 3 times in 5 min, return 'failed', alongside the error message: You have failed to try 3 times! Account is locked!
   - When this particular user has been locked, no matter the password he/she puts would be right or wrong, return 'failed', alongside the error message: account is locked! Please try again after `X` min
-- After 5min, the user who has been lcoked before should be unclocked, he/she can login again 🎉
+- After 5min, the user who has been locked before should be unclocked, he/she can login again 🎉
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Getting Started
